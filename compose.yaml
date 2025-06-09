@@ -1,0 +1,49 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: .docker/server/Dockerfile
+    container_name: k8s-todo-backend
+    environment:
+      TZ: "Asia/Tokyo"
+      POSTGRES_HOST: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_NAME: "postgres"
+      POSTGRES_PORT: "5432"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "4010:4010"
+    volumes:
+      - type: bind
+        source: ./server
+        target: /app/server
+      - type: bind
+        source: ./tsconfig.json
+        target: /app/tsconfig.json
+    depends_on:
+      - postgres
+
+  postgres:
+    build:
+      context: .
+      dockerfile: .docker/db/Dockerfile
+    container_name: k8s-todo-db
+    environment:
+      TZ: "Asia/Tokyo"
+      POSTGRES_HOST: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_NAME: "postgres"
+      POSTGRES_PORT: "5432"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"
+    volumes:
+      - type: volume
+        source: pgdata
+        target: /var/lib/postgresql/data
+      - type: bind
+        source: ./docker/db/init.d
+        target: /docker-entrypoint-initdb.d
+
+volumes:
+  pgdata:
