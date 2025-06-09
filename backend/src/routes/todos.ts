@@ -1,6 +1,6 @@
 import express from "express";
 import { pool } from "../db/db";
-import { RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 const router = express.Router();
 
@@ -13,16 +13,25 @@ router.get("/", async (_req, res) => {
 
 router.post("/", async (req, res) => {
   const { text } = req.body;
-  const [rows] = await pool.query<RowDataPacket[]>(
-    "INSERT INTO todos (text) VALUES ($1) RETURNING *",
+
+  // INSERT文（? プレースホルダ）
+  const [result] = await pool.query<ResultSetHeader>(
+    "INSERT INTO todos (text) VALUES (?)",
     [text]
   );
+
+  // insertId から再取得（任意）
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT * FROM todos WHERE id = ?",
+    [result.insertId]
+  );
+
   res.json(rows[0]);
 });
 
 router.delete("/:id", async (req, res) => {
   const id = req.params.id;
-  await pool.query("DELETE FROM todos WHERE id = $1", [id]);
+  await pool.query("DELETE FROM todos WHERE id = ?", [id]);
   res.sendStatus(204);
 });
 
