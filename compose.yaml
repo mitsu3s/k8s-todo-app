@@ -1,4 +1,21 @@
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: .docker/frontend/Dockerfile
+    container_name: k8s-todo-frontend
+    environment:
+      TZ: "Asia/Tokyo"
+      PORT: 4010
+    ports:
+      - "4010:4010"
+    volumes:
+      - type: bind
+        source: ./frontend
+        target: /app/frontend
+    depends_on:
+      - backend
+
   backend:
     build:
       context: .
@@ -11,14 +28,11 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: todos
     ports:
-      - "4010:4010"
+      - "4020:4020"
     volumes:
       - type: bind
         source: ./backend
         target: /app/backend
-      # - type: bind
-      #   source: ./tsconfig.json
-      #   target: /app/backend/tsconfig.json
     depends_on:
       - mysql
 

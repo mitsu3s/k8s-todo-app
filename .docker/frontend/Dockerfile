@@ -5,10 +5,11 @@ WORKDIR /app
 COPY backend/package*.json ./
 RUN npm install
 
-COPY backend .
+COPY frontend .
 
 RUN npm install -g ts-node typescript
 
-EXPOSE 4020
+EXPOSE 4010
 
-CMD ["npx", "ts-node", "src/server.ts"]
+# CMD ["export", "PORT=4010"]
+CMD ["npm", "start"]
