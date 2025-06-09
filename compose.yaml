@@ -2,48 +2,44 @@ services:
   backend:
     build:
       context: .
-      dockerfile: .docker/server/Dockerfile
+      dockerfile: .docker/backend/Dockerfile
     container_name: k8s-todo-backend
     environment:
       TZ: "Asia/Tokyo"
-      POSTGRES_HOST: "postgres"
-      POSTGRES_USER: "postgres"
-      POSTGRES_NAME: "postgres"
-      POSTGRES_PORT: "5432"
-      POSTGRES_PASSWORD: "postgres"
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: todos
     ports:
       - "4010:4010"
     volumes:
       - type: bind
-        source: ./server
-        target: /app/server
-      - type: bind
-        source: ./tsconfig.json
-        target: /app/tsconfig.json
+        source: ./backend
+        target: /app/backend
+      # - type: bind
+      #   source: ./tsconfig.json
+      #   target: /app/backend/tsconfig.json
     depends_on:
-      - postgres
+      - mysql
 
-  postgres:
+  mysql:
     build:
       context: .
       dockerfile: .docker/db/Dockerfile
     container_name: k8s-todo-db
     environment:
       TZ: "Asia/Tokyo"
-      POSTGRES_HOST: "postgres"
-      POSTGRES_USER: "postgres"
-      POSTGRES_NAME: "postgres"
-      POSTGRES_PORT: "5432"
-      POSTGRES_PASSWORD: "postgres"
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: todos
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
       - type: volume
-        source: pgdata
-        target: /var/lib/postgresql/data
+        source: mysqldata
+        target: /var/lib/mysql
       - type: bind
-        source: ./docker/db/init.d
+        source: .docker/db/init.d
         target: /docker-entrypoint-initdb.d
 
 volumes:
-  pgdata:
+  mysqldata:
