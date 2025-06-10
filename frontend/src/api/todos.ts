@@ -1,7 +1,6 @@
 import { Todo } from "../types/todos";
 
-const API_BASE =
-  "http://k8s-backend-service.k8s-todo-app.svc.cluster.local:4020/api/todos";
+const API_BASE = "/api/todos";
 
 export const fetchTodos = async (): Promise<Todo[]> => {
   const res = await fetch(API_BASE);

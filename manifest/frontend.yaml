@@ -41,5 +41,5 @@ spec:
     - name: http
       port: 4010
       targetPort: 4010
-      nodePort: 30010
+      nodePort: 30080
   type: NodePort
